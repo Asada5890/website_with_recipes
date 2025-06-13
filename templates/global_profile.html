@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль - Вкусные рецепты</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #e74c3c;
+            --secondary: #f39c12;
+            --accent: #27ae60;
+            --light: #fef9f3;
+            --dark: #2c241c;
+            --gray: #7f8c8d;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #fffdf9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: var(--primary);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            color: var(--light);
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-menu form .logout_btn{
+            all:unset;
+            color: var(--light);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .nav-menu form .logout_btn:hover{
+            color: rgb(133, 9, 9);
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem 1rem;
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Profile Layout */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 992px) {
+            .profile-grid {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 2rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .avatar-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--secondary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .edit-avatar {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--accent);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .edit-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .user-name {
+            font-size: 1.5rem;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .user-role {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .profile-details {
+            margin-top: 2rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-label {
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-value {
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .edit-profile-btn {
+            width: 100%;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: var(--radius);
+            margin-top: 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .edit-profile-btn:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        /* Content Section */
+        .content-section {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Recipes Columns */
+        .recipes-columns {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .recipes-columns {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .recipes-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .column-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .column-title {
+            font-size: 1.2rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        /* Recipes Grid */
+        .recipes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .recipe-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .recipe-image-container {
+            position: relative;
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .recipe-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .recipe-card:hover .recipe-image {
+            transform: scale(1.05);
+        }
+
+        .recipe-info {
+            padding: 1.5rem;
+        }
+
+        .recipe-title {
+            font-size: 1.1rem;
+            color: var(--dark);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .recipe-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .recipe-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.6rem;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .view-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+
+        .view-btn:hover {
+            background: #219653;
+        }
+
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 1rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .footer-section p {
+            margin-bottom: 0.75rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-icons a {
+            color: white;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            color: var(--secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-card {
+                position: static;
+            }
+
+            .recipes-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-menu {
+                gap: 1rem;
+            }
+
+            .nav-link {
+                padding: 0.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-utensils"></i>
+                Вкусные рецепты
+            </a>
+            <div class="nav-menu">
+                {% if current_user %}
+                    <a href="/profile/{{ current_user.id }}" class="nav-link">
+                        <i class="fas fa-user"></i>
+                        Мой профиль
+                    </a>
+                    <a href="/favorites" class="nav-link">
+                        <i class="fas fa-heart"></i>
+                        Избранное
+                    </a>
+                    <form action="/logout" method="post">
+                        <button class="logout_btn" type="submit" class="nav-link">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Выйти
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="/login" class="nav-link">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Войти
+                    </a>
+                    <a href="/register" class="nav-link">
+                        <i class="fas fa-user-plus"></i>
+                        Регистрация
+                    </a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="profile-grid">
+            <!-- Левая колонка - профиль -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="avatar-container">
+
+                        {% if is_owner %}
+                            <div class="edit-avatar">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <h2 class="user-name">{{ user.user_name }}</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">{{ user_recipes|length }}</div>
+                            <div class="stat-label">Рецепты</div>
+                        </div>
+                        <!-- Остальные статистические данные можно добавить позже -->
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    {% if user.email %}
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            <i class="fas fa-envelope"></i>
+                            Email:
+                        </span>
+                        <span class="detail-value">{{ user.email }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if user.bio %}
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            <i class="fas fa-info-circle"></i>
+                            О себе:
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if is_owner %}
+                <button class="edit-profile-btn">
+                    <i class="fas fa-edit"></i>
+                    Редактировать профиль
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- Правая колонка - рецепты пользователя -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-book-open"></i>
+                        {% if is_owner %}Мои рецепты{% else %}Рецепты пользователя{% endif %}
+                    </h3>
+                </div>
+
+                <div class="recipes-grid">
+    {% if user_recipes %}
+        {% for recipe in user_recipes %}
+        <div class="recipe-card">
+            <div class="recipe-image-container">
+                <img src="{{ recipe.images[0] }}" alt="{{ recipe.name }}" class="recipe-image">
+            </div>
+            <div class="recipe-info">
+                <h3 class="recipe-title">{{ recipe.name }}</h3>
+                <div class="recipe-meta">
+                    <span><i class="fas fa-clock"></i> {{ recipe.cooking_time }} мин.</span>
+                    <span><i class="fas fa-utensils"></i> {{ recipe.difficulty }}</span>
+                </div>
+                <p class="recipe-description">
+                    {{ recipe.description[:100] }}{% if recipe.description|length > 100 %}...{% endif %}
+                </p>
+                <a href="/recipe/{{ recipe._id }}" class="view-btn">Посмотреть рецепт</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-recipes">
+            <i class="fas fa-book-open"></i>
+            <p>{% if is_owner %}У вас пока нет рецептов{% else %}У пользователя пока нет рецептов{% endif %}</p>
+        </div>
+    {% endif %}
+</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Контакты</h3>
+                <p><i class="fas fa-phone"></i> +7 (495) 123-45-67</p>
+                <p><i class="fas fa-envelope"></i> info@vkusnoe.ru</p>
+                <p><i class="fas fa-map-marker-alt"></i> г. Москва, ул. Кулинарная, 10</p>
+            </div>
+            <div class="footer-section">
+                <h3>О нас</h3>
+                <p>Сообщество любителей вкусной еды</p>
+                <p>Делимся рецептами с 2015 года</p>
+            </div>
+            <div class="footer-section">
+                <h3>Соцсети</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-vk"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

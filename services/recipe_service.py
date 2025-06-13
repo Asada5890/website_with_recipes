@@ -34,6 +34,30 @@ class RecipeService:
         return self.collection.find_one(query)
    
     
+
+    
+    def get_recipes_by_author(self, author_id: int) -> list[dict]:
+        """Универсальный метод с поддержкой разных типов author_id"""
+        try:
+            # Пробуем int, string и даже ObjectId если нужно
+            queries = [
+                {"author_id": int(author_id)},
+                {"author_id": str(author_id)},
+                {"author_id": author_id}  # оригинальное значение
+            ]
+            
+            # Ищем по всем вариантам
+            for query in queries:
+                recipes = list(self.collection.find(query))
+                if recipes:
+                    return recipes
+            
+            return []
+        except Exception as e:
+            print(f"Error in get_recipes_by_author: {e}")
+            return []
+        
+
     def get_recipe_by_id(self, recipe_id):
         if isinstance(recipe_id, str):
             recipe_id = ObjectId(recipe_id)

@@ -530,6 +530,41 @@
             font-weight: bold;
             z-index: 10;
         }
+
+        .recipe-author {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 15px;
+}
+
+.author-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+    border: 2px solid #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.author-username {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    transition: color 0.3s ease;
+}
+
+.recipe-author a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.recipe-author a:hover .author-username {
+    color: #e76f51;
+    text-decoration: underline;
+}
     </style>
 </head>
 <body>
@@ -589,7 +624,7 @@
                             </a>
                             <span class="nav-separator">|</span>
                         {% else %}
-                            <a href="/profile" class="nav-link">
+                            <a href="/profile{{ id }}" class="nav-link">
                                 <i class="fas fa-user"></i>
                                 Профиль
                             </a>
@@ -619,6 +654,13 @@
     {% if recipes %}
         {% for recipe in recipes %}
         <div class="recipe-card">
+            <!-- Блок автора рецепта -->
+            <div class="recipe-author">
+                <a href="/profile/{{ recipe.author.id }}">
+                    <span class="author-username">{{ recipe.author.user_name }}</span>
+                </a>
+            </div>
+            
             <div class="recipe-image-container">
                 {% if recipe.images and recipe.images[0] %}
                     <img src="{{ recipe.images[0] }}" alt="{{ recipe.name }}" class="recipe-image">
@@ -633,6 +675,7 @@
                     </div>
                 {% endif %}
             </div>
+            
             <div class="recipe-info">
                 <a href="/recipe/{{ recipe._id }}">
                     <h3 class="recipe-title">{{ recipe.name }}</h3>

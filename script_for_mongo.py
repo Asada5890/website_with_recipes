@@ -11,6 +11,7 @@ collection = db['recepies']
 recipes = [
     {
         "_id": ObjectId("507f1f77bcf86cd799439011"),
+        "user_id": 1,
         "name": "Паста Карбонара",
         "description": "Классическая итальянская паста с хрустящим беконом и сливочным соусом",
         "cooking_time": 25,
@@ -40,6 +41,7 @@ recipes = [
     },
     {
         "_id": ObjectId("507f1f77bcf86cd799439012"),
+        "user_id": 1,
         "name": "Овсяноблин с бананом",
         "description": "Полезный и быстрый завтрак с овсяными хлопьями и фруктами",
         "cooking_time": 15,
@@ -68,6 +70,7 @@ recipes = [
     },
     {
         "_id": ObjectId("507f1f77bcf86cd799439013"),
+        "user_id": 1,
         "name": "Тирамису",
         "description": "Нежный итальянский десерт с кофейной пропиткой",
         "cooking_time": 40,
@@ -100,6 +103,7 @@ recipes = [
     },
     {
         "_id": ObjectId("507f1f77bcf86cd799439014"),
+        "user_id": 1,
         "name": "Мохито безалкогольный",
         "description": "Освежающий летний напиток с лаймом и мятой",
         "cooking_time": 5,
@@ -129,6 +133,7 @@ recipes = [
     },
     {
         "_id": ObjectId("507f1f77bcf86cd799439015"),
+        "user_id": 1,
         "name": "Овощная запеканка с сыром",
         "description": "Ароматная запеканка из сезонных овощей под сырной корочкой",
         "cooking_time": 35,

@@ -115,39 +115,39 @@ async def logout_user():
     return response
 
 
-# @router.get("/profile", response_class=HTMLResponse)
-# def profile_page(request: Request):
-#     # Проверяем наличие токена в куках
-#     token = request.cookies.get("access_token")
-#     if not token:
-#         return RedirectResponse(url="/login", status_code=303)
+@router.get("/profile", response_class=HTMLResponse)
+def profile_page(request: Request):
+    # Проверяем наличие токена в куках
+    token = request.cookies.get("access_token")
+    if not token:
+        return RedirectResponse(url="auth_templates/login", status_code=303)
     
-#     try:
-#         # Декодируем токен
-#         payload = jwt.decode(
-#             token.replace("Bearer ", ""),
-#             settings.SECRET_KEY,
-#             algorithms=[settings.JWT_ALGORITHM]
-#         )
+    try:
+        # Декодируем токен
+        payload = jwt.decode(
+            token.replace("Bearer ", ""),
+            settings.SECRET_KEY,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
         
-#         # Извлекаем данные пользователя из payload
-#         user_email = payload.get("email")  
-#         user_role = payload.get("role")
+        # Извлекаем данные пользователя из payload
+        user_email = payload.get("email")  
+        user_role = payload.get("role")
 
 
         
-#     except (JWTError, KeyError):
-#         # Обработка невалидного токена
-#         response = RedirectResponse(url="/login", status_code=303)
-#         response.delete_cookie("access_token")
-#         return response
+    except (JWTError, KeyError):
+        # Обработка невалидного токена
+        response = RedirectResponse(url="/login", status_code=303)
+        response.delete_cookie("access_token")
+        return response
     
-#     # Передаем данные в шаблон профиля
-#     return templates.TemplateResponse(
-#         "profile.html",
-#         {
-#             "request": request,
-#             "user_email": user_email,
-#             "user_role": user_role
-#         }
-#     )
+    # Передаем данные в шаблон профиля
+    return templates.TemplateResponse(
+        "auth_templates/profile.html",
+        {
+            "request": request,
+            "user_email": user_email,
+            "user_role": user_role
+        }
+    )
