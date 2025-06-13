@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали рецепта</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary: #e74c3c;
+            --secondary: #f39c12;
+            --accent: #27ae60;
+            --light: #fef9f3;
+            --dark: #2c241c;
+            --gray: #7f8c8d;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Arial', sans-serif;
+        }
+
+        body {
+            background: #fffdf9;
+            min-height: 100vh;
+            line-height: 1.6;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23fef9f3"/><path d="M20,20 Q40,5 60,20 T100,20 Q85,40 100,60 T100,100 Q80,85 60,100 T20,100 Q5,80 20,60 T20,20" fill="%23f9e9d4" opacity="0.5"/></svg>');
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            color: var(--light);
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--light);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Recipe Detail Container */
+        .recipe-detail-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .recipe-header {
+            padding: 2rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            text-align: center;
+        }
+
+        .recipe-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .recipe-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            font-size: 1.1rem;
+        }
+
+        .recipe-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .recipe-content {
+            padding: 2rem;
+        }
+
+        .recipe-main-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: var(--radius);
+        }
+
+        .recipe-image-placeholder {
+            height: 300px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+        }
+
+        .recipe-description,
+        .recipe-ingredients,
+        .recipe-instructions {
+            margin: 2rem 0;
+        }
+
+        .recipe-description h2,
+        .recipe-ingredients h2,
+        .recipe-instructions h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .recipe-description p {
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .recipe-ingredients ul {
+            list-style-type: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .recipe-ingredients li {
+            padding: 0.8rem;
+            background: #f9f9f9;
+            border-radius: 8px;
+            position: relative;
+            padding-left: 2rem;
+            transition: var(--transition);
+        }
+
+        .recipe-ingredients li:hover {
+            transform: translateX(5px);
+            background: #f0f0f0;
+        }
+
+        .recipe-ingredients li:before {
+            content: "•";
+            color: var(--accent);
+            font-size: 1.5rem;
+            position: absolute;
+            left: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .recipe-instructions ol {
+            counter-reset: step-counter;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .recipe-instructions li {
+            counter-increment: step-counter;
+            margin-bottom: 1.5rem;
+            padding-left: 3.5rem;
+            position: relative;
+            line-height: 1.7;
+        }
+
+        .recipe-instructions li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: var(--accent);
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .recipe-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+
+        .save-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .save-btn:hover {
+            background: #219653;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .back-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: #e67e22;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .footer-section p {
+            margin-bottom: 0.75rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .social-icons a {
+            color: white;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            color: var(--secondary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .recipe-header h1 {
+                font-size: 2rem;
+            }
+            
+            
+            .recipe-meta {
+                gap: 1rem;
+                font-size: 1rem;
+            }
+            
+            .recipe-ingredients ul {
+                grid-template-columns: 1fr;
+            }
+            
+            .recipe-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-link {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .recipe-header {
+                padding: 1.5rem 1rem;
+            }
+            
+            .recipe-content {
+                padding: 1.5rem;
+            }
+            
+            .recipe-description,
+            .recipe-ingredients,
+            .recipe-instructions {
+                margin: 1.5rem 0;
+            }
+            
+            .recipe-instructions li {
+                padding-left: 2.5rem;
+            }
+            
+            .recipe-instructions li:before {
+                width: 2rem;
+                height: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="/" class="logo">
+            <i class="fas fa-utensils"></i>
+            Вкусные рецепты
+        </a>
+        <div class="nav-menu">
+            <a href="/" class="nav-link">
+                <i class="fas fa-home"></i>
+                Главная
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fas fa-list"></i>
+                Категории
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fas fa-fire"></i>
+                Популярное
+            </a>
+        </div>
+    </header>
+
+    <div class="recipe-detail-container">
+        <div class="recipe-header">
+            <h1>{{ recipe.name }}</h1>
+            <div class="recipe-meta">
+                <span><i class="fas fa-clock"></i> {{ recipe.cooking_time }} мин.</span>
+                <span><i class="fas fa-utensils"></i> {{ recipe.difficulty }}</span>
+                <span><i class="fas fa-user-friends"></i> {{ recipe.servings }} порции</span>
+                <span><i class="fas fa-calendar"></i> {{ recipe.created_at.strftime('%d.%m.%Y') }}</span>
+            </div>
+        </div>
+
+        <div class="recipe-content">
+            <div class="recipe-image-container">
+                {% if recipe.images and recipe.images[0] %}
+                    <img src="{{ recipe.images[0] }}" alt="{{ recipe.name }}" class="recipe-main-image">
+                {% else %}
+                    <div class="recipe-image-placeholder">
+                        <i class="fas fa-image fa-5x" style="color: #ccc;"></i>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="recipe-description">
+                <h2>Описание</h2>
+                <p>{{ recipe.description }}</p>
+            </div>
+
+            <div class="recipe-ingredients">
+                <h2>Ингредиенты</h2>
+                <ul>
+                    {% for ingredient in recipe.ingredients %}
+                    <li>{{ ingredient }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="recipe-instructions">
+                <h2>Инструкция приготовления</h2>
+                <ol>
+                    {% for instruction in recipe.instructions %}
+                    <li>{{ instruction }}</li>
+
+                    {% endfor %}
+                </ol>
+            </div>
+
+            <div class="recipe-actions">
+                <a href="/" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    На главную
+                </a>
+                <form action="/add_to_favorites" method="POST">
+                    <input type="hidden" name="recipe_id" value="{{ recipe._id }}">
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-heart"></i> Сохранить рецепт
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Контакты</h3>
+                <p><i class="fas fa-phone"></i> +7 (495) 123-45-67</p>
+                <p><i class="fas fa-envelope"></i> info@vkusnoe.ru</p>
+                <p><i class="fas fa-map-marker-alt"></i> г. Москва, ул. Кулинарная, 10</p>
+            </div>
+            <div class="footer-section">
+                <h3>О нас</h3>
+                <p>Сообщество любителей вкусной еды</p>
+                <p>Делимся лучшими рецептами с 2015 года</p>
+            </div>
+            <div class="footer-section">
+                <h3>Соцсети</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-vk"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
