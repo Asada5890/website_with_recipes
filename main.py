@@ -13,6 +13,8 @@ app = FastAPI(
     openapi_url='/api/openapi.json',
 )
 
+app.mount("/images", StaticFiles(directory="static/images"), name="images")
+
 # app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
 # Сначала добавляем CORS middleware

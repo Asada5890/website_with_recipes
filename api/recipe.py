@@ -108,7 +108,7 @@ async def view_user_profile(
 
     # Получаем рецепты пользователя
     user_recipes = recipe_service.get_recipes_by_author(user_id)
-    print(f"Found {len(user_recipes)} recipes for user {user_id}")  # Для отладки
+
 
     # Преобразуем ObjectId и добавляем дополнительные поля
     processed_recipes = []
@@ -119,14 +119,12 @@ async def view_user_profile(
             recipe["images"] = ["/static/images/recipe-default.jpg"]
         processed_recipes.append(recipe)
 
-    # Проверяем владельца профиля
+    
     is_owner = current_user and current_user.get("id") == user_id
-    print(f"User ID: {user_id}")
-    print(f"User data: {user}")
-    print(f"Recipes found: {user_recipes}")
+
     return templates.TemplateResponse("global_profile.html", {
         "request": request,
-        "user": user,  # Передаём весь объект user
+        "user": user,  
         "user_recipes": processed_recipes,
         "is_owner": is_owner,
         "current_user": current_user

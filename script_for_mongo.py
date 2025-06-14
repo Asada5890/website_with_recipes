@@ -103,7 +103,7 @@ recipes = [
     },
     {
         "_id": ObjectId("507f1f77bcf86cd799439014"),
-        "user_id": 1,
+        "user_id": 2,
         "name": "Мохито безалкогольный",
         "description": "Освежающий летний напиток с лаймом и мятой",
         "cooking_time": 5,
@@ -133,7 +133,7 @@ recipes = [
     },
     {
         "_id": ObjectId("507f1f77bcf86cd799439015"),
-        "user_id": 1,
+        "user_id": 2,
         "name": "Овощная запеканка с сыром",
         "description": "Ароматная запеканка из сезонных овощей под сырной корочкой",
         "cooking_time": 35,
@@ -178,3 +178,5 @@ except Exception as e:
 finally:
     # Закрытие соединения
     client.close()
+
+

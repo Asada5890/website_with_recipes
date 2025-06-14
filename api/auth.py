@@ -84,7 +84,7 @@ async def login_user(
     except UserDoesNotExist:
         
         return templates.TemplateResponse(
-            "login.html",
+            "auth_templates/login.html",
             {
                 "request": request,
                 "error": "Неверный email или пароль",
@@ -94,7 +94,7 @@ async def login_user(
     except ValidationError as e:
         print(f"Validation error: {e.errors()}")
         return templates.TemplateResponse(
-            "login.html",
+            "auth_templates/login.html",
             {"request": request, "error": "Некорректный формат данных"},
             status_code=400
         )
@@ -130,9 +130,8 @@ def profile_page(request: Request):
             algorithms=[settings.JWT_ALGORITHM]
         )
         
-        # Извлекаем данные пользователя из payload
         user_email = payload.get("email")  
-        user_role = payload.get("role")
+        user_id = payload.get("id")  
 
 
         
@@ -144,10 +143,10 @@ def profile_page(request: Request):
     
     # Передаем данные в шаблон профиля
     return templates.TemplateResponse(
-        "auth_templates/profile.html",
+        "global_profile.html",
         {
             "request": request,
             "user_email": user_email,
-            "user_role": user_role
+            "user_id": user_id,
         }
     )

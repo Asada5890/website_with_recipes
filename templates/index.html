@@ -536,6 +536,8 @@
     align-items: center;
     margin-bottom: 10px;
     padding: 0 15px;
+    margin: 10px auto;
+
 }
 
 .author-avatar {
@@ -553,12 +555,14 @@
     font-weight: 600;
     color: #495057;
     transition: color 0.3s ease;
+    font-size: 24px;
 }
 
 .recipe-author a {
     display: flex;
     align-items: center;
     text-decoration: none;
+    font-size: 24px;
 }
 
 .recipe-author a:hover .author-username {
@@ -624,7 +628,7 @@
                             </a>
                             <span class="nav-separator">|</span>
                         {% else %}
-                            <a href="/profile{{ id }}" class="nav-link">
+                            <a href="/profile/{{ id }}" class="nav-link">
                                 <i class="fas fa-user"></i>
                                 Профиль
                             </a>
@@ -657,7 +661,7 @@
             <!-- Блок автора рецепта -->
             <div class="recipe-author">
                 <a href="/profile/{{ recipe.author.id }}">
-                    <span class="author-username">{{ recipe.author.user_name }}</span>
+                    <span class="author-username">Автор: {{ recipe.author.user_name }}</span>
                 </a>
             </div>
             
