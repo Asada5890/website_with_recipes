@@ -1,8 +1,9 @@
+import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
-from api import auth, recipe
+from api import auth, recipe, favorites
 from db.session import init
 
 
@@ -13,7 +14,21 @@ app = FastAPI(
     openapi_url='/api/openapi.json',
 )
 
-app.mount("/images", StaticFiles(directory="static/images"), name="images")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Монтируем папку для изображений
+app.mount(
+    "/images", 
+    StaticFiles(directory=os.path.join(BASE_DIR, "static", "images")), 
+    name="images"
+)
+
+# Монтируем общую папку static для остальных файлов
+app.mount(
+    "/static", 
+    StaticFiles(directory=os.path.join(BASE_DIR, "static")), 
+    name="static"
+)
 
 # app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
@@ -30,6 +45,7 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix='', tags=["auth"]) # Ауентификация
 app.include_router(recipe.router, prefix='', tags=["recipe"]) # Рецепты
+app.include_router(favorites.router, prefix='', tags=["favorites"]) # Избранное
 
 
 

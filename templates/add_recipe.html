@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить рецепт</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e74c3c;
+            --secondary: #f39c12;
+            --accent: #27ae60;
+            --light: #fef9f3;
+            --dark: #2c241c;
+            --gray: #7f8c8d;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Arial', sans-serif;
+        }
+
+        body {
+            background: #fffdf9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23fef9f3"/><path d="M20,20 Q40,5 60,20 T100,20 Q85,40 100,60 T100,100 Q80,85 60,100 T20,100 Q5,80 20,60 T20,20" fill="%23f9e9d4" opacity="0.5"/></svg>');
+        }
+
+        /* Header */
+        header {
+            background: var(--primary);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(8px);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            color: var(--light);
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo:hover {
+            opacity: 0.9;
+        }
+
+        .logo i {
+            color: var(--light);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Auth Buttons */
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-separator {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .logout-btn {
+            all:unset;
+            color: white;
+            transition: 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .logout-btn:hover {
+            color: #f1c40f;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem 1rem;
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .container {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            margin: 2rem auto;
+            max-width: 800px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: #219653;
+            transform: translateY(-2px);
+        }
+
+        .btn i {
+            color: white;
+        }
+
+        .error-message {
+            color: var(--primary);
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 1rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .footer-section p {
+            margin-bottom: 0.75rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-icons a {
+            color: white;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover {
+            color: var(--secondary);
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 1rem;
+            }
+
+            .nav-link {
+                padding: 0.5rem;
+            }
+        }
+
+        h1, h2 {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-utensils"></i>
+                Рецепты
+            </a>
+            <nav class="nav-menu">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    Главная
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-list"></i>
+                    Категории
+                </a>
+                <a href="/favorites" class="nav-link">
+                    <i class="fas fa-heart"></i>
+                    Избранное
+                </a>
+            </nav>
+            <div class="auth-buttons">
+                {% if user %}
+                    <div class="user-menu">
+                        <a href="/profile/{{ user.id }}" class="nav-link">
+                            <i class="fas fa-user"></i>
+                            {{ user.username }}
+                        </a>
+                        <span class="nav-separator">|</span>
+                        <form action="/logout" method="post" style="display:inline;">
+                            <button type="submit" class="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Выйти
+                            </button>
+                        </form>
+                    </div>
+                {% else %}
+                    <a href="/login" class="nav-link">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Войти
+                    </a>
+                    <span class="nav-separator">|</span>
+                    <a href="/register" class="nav-link">
+                        <i class="fas fa-user-plus"></i>
+                        Регистрация
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <h1>Добавить новый рецепт</h1>
+            
+            {% if error %}
+                <div class="error-message">{{ error }}</div>
+            {% endif %}
+            
+            <form method="POST" action="/add" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="name">Название рецепта</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Описание</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cooking_time">Время приготовления (минут)</label>
+                    <input type="number" class="form-control" id="cooking_time" name="cooking_time" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="difficulty">Сложность</label>
+                    <select class="form-control" id="difficulty" name="difficulty" required>
+                        <option value="Легко">Легко</option>
+                        <option value="Средне">Средне</option>
+                        <option value="Сложно">Сложно</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="servings">Количество порций</label>
+                    <input type="number" class="form-control" id="servings" name="servings" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ingredients">Ингредиенты (каждый ингредиент с новой строки)</label>
+                    <textarea class="form-control" id="ingredients" name="ingredients" rows="5" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="instructions">Шаги приготовления (каждый шаг с новой строки)</label>
+                    <textarea class="form-control" id="instructions" name="instructions" rows="5" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Категория</label>
+                    <input type="text" class="form-control" id="category" name="category" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="image">Изображение рецепта</label>
+                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                    <small class="form-text text-muted">Поддерживаемые форматы: JPG, PNG, GIF</small>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-plus-circle"></i>
+                    Добавить рецепт
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>О нас</h3>
+                <p>Кулинарное сообщество, где каждый может поделиться своими рецептами и найти вдохновение.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Контакты</h3>
+                <p><i class="fas fa-envelope"></i> info@example.com</p>
+                <p><i class="fas fa-phone"></i> +7 (999) 999-99-99</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-vk"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Полезные ссылки</h3>
+                <p><a href="/" style="color:white; text-decoration:none;"><i class="fas fa-home"></i> Главная</a></p>
+                <p><a href="#" style="color:white; text-decoration:none;"><i class="fas fa-list"></i> Категории</a></p>
+                <p><a href="/favorites" style="color:white; text-decoration:none;"><i class="fas fa-heart"></i> Избранное</a></p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -12,3 +12,5 @@ class User(Base):
     password = Column(String(255), nullable=False)  
     phone_number = Column(String(20), nullable=True)
 
+    
+    favorites = relationship("Favorite", back_populates="user")

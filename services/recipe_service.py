@@ -1,3 +1,4 @@
+from datetime import datetime
 from db.mongo import recipes
 from bson import ObjectId
 
@@ -62,6 +63,25 @@ class RecipeService:
             return []
         
 
+
+    def add_recipe(self, recipe_data: dict):
+        """
+        Добавляет новый рецепт в базу данных
+        """
+        # Убедимся, что все необходимые поля есть
+        if not recipe_data.get("created_at"):
+            recipe_data["created_at"] = datetime.utcnow()
+        
+        if "images" not in recipe_data:
+            recipe_data["images"] = []
+            
+        if "featured" not in recipe_data:
+            recipe_data["featured"] = False
+            
+        # Вставляем рецепт в коллекцию
+        result = self.collection.insert_one(recipe_data)
+        return str(result.inserted_id)
+    
     def get_recipe_by_id(self, recipe_id):
         if isinstance(recipe_id, str):
             recipe_id = ObjectId(recipe_id)

@@ -606,46 +606,50 @@
                     </h3>
                 </div>
 
-                <div class="recipes-columns">
-                    <!-- Колонка с моими рецептами -->
-                    <div class="recipes-column">
-                        <div class="column-header">
-                            <div class="column-icon" style="background-color: #f0f7ff;">
-                                <i class="fas fa-pen-fancy" style="color: #3498db;"></i>
-                            </div>
-                            <h4 class="column-title">Мои рецепты</h4>
-                        </div>
+               <div class="recipes-column">
+    <div class="column-header">
+        <div class="column-icon" style="background-color: #fff0f3;">
+            <i class="fas fa-heart" style="color: #e74c3c;"></i>
+        </div>
+        <h4 class="column-title">Избранное</h4>
+    </div>
 
-                        <div class="recipes-grid">
-                            <div class="recipe-card">
-                                <div class="recipe-image-container">
-                                    <img src="https://via.placeholder.com/300x180" alt="Паста Карбонара" class="recipe-image">
-                                </div>
-                                <div class="recipe-info">
-                                    <h4 class="recipe-title">Паста Карбонара</h4>
-                                    <div class="recipe-meta">
-                                        <span class="meta-item">
-                                            <i class="fas fa-clock"></i> 25 мин.
-                                        </span>
-                                        <span class="meta-item">
-                                            <i class="fas fa-utensils"></i> Средне
-                                        </span>
-                                        <span class="meta-item">
-                                            <i class="fas fa-user-friends"></i> 2 порции
-                                        </span>
-                                    </div>
-                                    <div class="recipe-actions">
-                                        <button class="action-btn view-btn">
-                                            <i class="fas fa-eye"></i>
-                                            Просмотр
-                                        </button>
-                                        <button class="action-btn remove-btn">
-                                            <i class="fas fa-trash"></i>
-                                            Удалить
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+    <div class="recipes-grid">
+        {% for recipe in favorite_recipes %}
+        <div class="recipe-card">
+            <div class="recipe-image-container">
+                <img src="{% if recipe.images and recipe.images[0] %}{{ recipe.images[0] }}{% else %}https://via.placeholder.com/300x180{% endif %}" 
+                     alt="{{ recipe.name }}" 
+                     class="recipe-image">
+            </div>
+            <div class="recipe-info">
+                <h4 class="recipe-title">{{ recipe.name }}</h4>
+                <div class="recipe-meta">
+                    <span class="meta-item">
+                        <i class="fas fa-clock"></i> {{ recipe.cooking_time }} мин.
+                    </span>
+                    <span class="meta-item">
+                        <i class="fas fa-utensils"></i> {{ recipe.difficulty }}
+                    </span>
+                    <span class="meta-item">
+                        <i class="fas fa-user-friends"></i> {{ recipe.servings }} порции
+                    </span>
+                </div>
+                <div class="recipe-actions">
+                    <a href="/recipe/{{ recipe._id }}" class="action-btn view-btn">
+                        <i class="fas fa-eye"></i> Просмотр
+                    </a>
+                    <button class="action-btn remove-btn"
+                            onclick="removeFavorite('{{ recipe._id }}')">
+                        <i class="fas fa-trash"></i> Удалить
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
 
                             <div class="recipe-card">
                                 <div class="recipe-image-container">
@@ -780,4 +784,24 @@
         </div>
     </footer>
 </body>
+
+<script>
+
+    async function removeFavorite(recipeId) {
+    try {
+        const response = await fetch(`/api/favorites/${recipeId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${getCookie('access_token')}`
+            }
+        });
+        
+        if (response.ok) {
+            location.reload();
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+    }
+}
+</script>
 </html>

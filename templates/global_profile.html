@@ -616,7 +616,7 @@
         {% for recipe in user_recipes %}
         <div class="recipe-card">
             <div class="recipe-image-container">
-                <img src="{{ recipe.images[0] }}" alt="{{ recipe.name }}" class="recipe-image">
+                <img src="/images/{{ recipe.images[0].split('/')[-1] }}" alt="{{ recipe.name }}" class="recipe-main-image">
             </div>
             <div class="recipe-info">
                 <h3 class="recipe-title">{{ recipe.name }}</h3>

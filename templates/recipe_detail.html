@@ -420,16 +420,15 @@
             </div>
         </div>
 
-        <div class="recipe-content">
-            <div class="recipe-image-container">
-                {% if recipe.images and recipe.images[0] %}
-                    <img src="{{ recipe.images[0] }}" alt="{{ recipe.name }}" class="recipe-main-image">
-                {% else %}
-                    <div class="recipe-image-placeholder">
-                        <i class="fas fa-image fa-5x" style="color: #ccc;"></i>
-                    </div>
-                {% endif %}
-            </div>
+        <div class="recipe-image-container">
+    {% if recipe.images and recipe.images[0] %}
+        <img src="/images/{{ recipe.images[0].split('/')[-1] }}" alt="{{ recipe.name }}" class="recipe-main-image">
+    {% else %}
+        <div class="recipe-image-placeholder">
+            <i class="fas fa-image" style="font-size: 3rem; color: #ccc;"></i>
+        </div>
+    {% endif %}
+</div>
 
             <div class="recipe-description">
                 <h2>Описание</h2>
@@ -460,7 +459,7 @@
                     <i class="fas fa-arrow-left"></i>
                     На главную
                 </a>
-                <form action="/add_to_favorites" method="POST">
+                <form action="/favorites/toggle" method="POST">
                     <input type="hidden" name="recipe_id" value="{{ recipe._id }}">
                     <button type="submit" class="save-btn">
                         <i class="fas fa-heart"></i> Сохранить рецепт
