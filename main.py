@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
-from api import auth, recipe, favorites
+from api import auth, recipe, favorites, no_main_pages
 from db.session import init
 
 
@@ -46,6 +46,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix='', tags=["auth"]) # Ауентификация
 app.include_router(recipe.router, prefix='', tags=["recipe"]) # Рецепты
 app.include_router(favorites.router, prefix='', tags=["favorites"]) # Избранное
+app.include_router(no_main_pages.router, prefix='', tags=["no_main_pages"]) # второстепенные страницы
 
 
 

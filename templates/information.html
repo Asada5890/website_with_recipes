@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О сайте - Вкусные рецепты</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e74c3c;
+            --light: #fef9f3;
+            --dark: #2c241c;
+            --gray: #7f8c8d;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+            --radius: 12px;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #fffdf9;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--primary);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: var(--light);
+            font-size: 1.6rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .info-container {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .user-greeting {
+            font-style: italic;
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo"><i class="fas fa-home"></i> Вкусные рецепты</a>
+        </div>
+    </header>
+
+    <div class="info-container">
+        <h1>О проекте</h1>
+        {% if user %}
+        
+        {% endif %}
+        <p>«Вкусные рецепты» — это онлайн-платформа, где пользователи могут делиться своими любимыми блюдами, сохранять рецепты в избранное и вдохновляться идеями других кулинаров.</p>
+        <p>Мы стремимся создать уютное сообщество для всех, кто любит готовить: от начинающих до опытных шефов.</p>
+        <p>Присоединяйтесь, публикуйте свои рецепты, сохраняйте понравившиеся и делитесь впечатлениями!</p>
+    </div>
+</body>
+</html>
