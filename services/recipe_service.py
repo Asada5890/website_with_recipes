@@ -107,8 +107,12 @@ class RecipeService:
         except Exception as e:
             print(f"Error updating recipe: {str(e)}")
             return False
+
+    # recipe_service.py
+    def get_all_categories(self):
+        return self.collection.distinct("category")
     
-    def get_recepies_by_category(self, category_name):
+    def get_recipes_by_category(self, category_name):
         """
         Возвращает все продукты по категории
         """

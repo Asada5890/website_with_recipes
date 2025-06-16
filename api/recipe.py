@@ -35,6 +35,7 @@ def main_page(
     # Получаем все рецепты
     recipes = recipe_service.get_all_recipes()
     fav_service = FavoriteService(db)
+    categories = recipe_service.get_all_categories()
     # Для каждого рецепта:
     for recipe in recipes:
         # 1. Преобразуем ObjectId в строку
@@ -73,7 +74,9 @@ def main_page(
     return templates.TemplateResponse("index.html", 
                                       {"request": request,
                                        "recipes": recipes,
-                                       "user": current_user}
+                                       "user": current_user,
+                                       "categories": categories,
+                                       "current_category": None}
                                     )
 
 
@@ -383,3 +386,62 @@ async def delete_recipe(
             f"/recipe/{recipe_id}",
             status_code=303
         )
+    
+
+
+
+@router.get('/category/{category_name}', response_class=HTMLResponse)
+def recipes_by_category(
+    request: Request,
+    category_name: str,
+    recipe_service: RecipeService = Depends(),
+    user_service: UserService = Depends(),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    # Получаем все рецепты по категории
+    recipes = recipe_service.get_recipes_by_category(category_name)
+    fav_service = FavoriteService(db)
+    
+        
+    # Для каждого рецепта:
+    for recipe in recipes:
+        # 1. Преобразуем ObjectId в строку
+        recipe["_id"] = str(recipe["_id"])
+        
+        if current_user:
+            recipe["is_favorite"] = fav_service.is_recipe_in_favorites(
+                current_user["id"], 
+                str(recipe["_id"])
+            )
+
+
+        if not recipe.get("images") or not recipe["images"][0]:
+            recipe["images"] = ["/static/images/recipe-default.jpg"]
+        else:
+            # Преобразуем относительные пути в абсолютные
+            recipe["images"] = [img if img.startswith("/static") else f"/static/{img}" for img in recipe["images"]]
+        # 2. Получаем информацию об авторе
+        author_id = recipe.get("user_id")
+        if author_id:
+            try:
+                author = user_service.get_user_by_id(author_id)
+                recipe["author"] = {
+                    "id": author.id,
+                    "user_name": author.user_name,
+                }
+            except Exception as e:
+                recipe["author"] = {"username": "Неизвестный автор"}
+        else:
+            recipe["author"] = {"username": "Автор не указан"}
+    
+    # Получаем все категории для меню
+    all_categories = recipe_service.get_all_categories()
+    
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "recipes": recipes,
+        "user": current_user,
+        "categories": all_categories,
+        "current_category": category_name
+    })

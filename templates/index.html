@@ -540,6 +540,25 @@
             z-index: 10;
         }
 
+        /* index.html */
+.dropdown-link.active {
+    background-color: #f1f1f1;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+/* В баннере для активной категории */
+.banner h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    {% if current_category %}
+        font-size: 2rem;
+    {% endif %}
+}
+
         .recipe-author {
     display: flex;
     align-items: center;
@@ -593,14 +612,18 @@
                         <i class="fas fa-list"></i>
                         Категории
                     </a>
-                    <div class="dropdown-menu">
-                        {% for category in categories %}
-                        <a href="/category/{{ category }}" class="dropdown-link">
-                            <i class="fas fa-{% if category == 'Завтраки' %}egg{% elif category == 'Основные блюда' %}drumstick-bite{% elif category == 'Десерты' %}ice-cream{% elif category == 'Напитки' %}glass-martini{% else %}utensils{% endif %}"></i>
-                            {{ category }}
-                        </a>
-                        {% endfor %}
-                    </div>
+                   <div class="dropdown-menu">
+                    <a href="/" class="dropdown-link">
+                        <i class="fas fa-home"></i>
+                        Все категории
+                    </a>
+                    {% for category in categories %}
+                    <a href="/category/{{ category }}" class="dropdown-link">
+                        <i class="fas fa-{% if category == 'Завтраки' %}egg{% elif category == 'Основные блюда' %}drumstick-bite{% elif category == 'Десерты' %}ice-cream{% elif category == 'Напитки' %}glass-martini{% else %}utensils{% endif %}"></i>
+                        {{ category }}
+                    </a>
+                    {% endfor %}
+                </div>
                 </div>
                 <a href="/popular" class="nav-link">
                     <i class="fas fa-fire"></i>
@@ -660,9 +683,21 @@
 
     <main>
         <div class="banner">
-            <h1>Лучшие рецепты для вашей кухни</h1>
-            <p>Более 1000 проверенных рецептов от профессиональных шеф-поваров и домашних кулинаров</p>
-        </div>
+    <h1>
+        {% if current_category %}
+            Рецепты категории: {{ current_category }}
+        {% else %}
+            Лучшие рецепты для вашей кухни
+        {% endif %}
+    </h1>
+    <p>
+        {% if current_category %}
+            Найдено рецептов: {{ recipes|length }}
+        {% else %}
+            Более 1000 проверенных рецептов от профессиональных шеф-поваров и домашних кулинаров
+        {% endif %}
+    </p>
+</div>
         
         <div class="products-grid">
             {% if recipes %}
