@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Добавить рецепт</title>
+    <title>Редактировать рецепт</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -170,7 +170,6 @@
         }
 
         .btn {
-            background: var(--accent);
             color: white;
             border: none;
             padding: 0.8rem 1.5rem;
@@ -182,10 +181,24 @@
             gap: 0.5rem;
             font-weight: 500;
             font-size: 1rem;
+            margin-right: 10px;
         }
 
-        .btn:hover {
+        .btn-save {
+            background: var(--accent);
+        }
+
+        .btn-save:hover {
             background: #219653;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: var(--primary);
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
             transform: translateY(-2px);
         }
 
@@ -197,6 +210,25 @@
             color: var(--primary);
             margin-top: 0.5rem;
             font-size: 0.9rem;
+        }
+
+        .current-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--radius);
+            margin-top: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .image-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .image-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
         }
 
         /* Footer */
@@ -261,6 +293,17 @@
             .container {
                 padding: 1.5rem;
             }
+            
+            .action-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -277,6 +320,12 @@
             color: var(--dark);
             margin-bottom: 1.5rem;
         }
+        
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
     </style>
 </head>
 <body>
@@ -292,6 +341,10 @@
                     <i class="fas fa-home"></i>
                     Главная
                 </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-list"></i>
+                    Категории
+                </a>
                 <a href="/favorites" class="nav-link">
                     <i class="fas fa-heart"></i>
                     Избранное
@@ -300,6 +353,11 @@
             <div class="auth-buttons">
                 {% if user %}
                     <div class="user-menu">
+                        <a href="/profile/{{ user.id }}" class="nav-link">
+                            <i class="fas fa-user"></i>
+                            {{ user.username }}
+                        </a>
+                        <span class="nav-separator">|</span>
                         <form action="/logout" method="post" style="display:inline;">
                             <button type="submit" class="logout-btn">
                                 <i class="fas fa-sign-out-alt"></i>
@@ -325,67 +383,137 @@
     <!-- Main Content -->
     <main>
         <div class="container">
-            <h1>Добавить новый рецепт</h1>
+            <h1>Редактировать рецепт</h1>
             
             {% if error %}
                 <div class="error-message">{{ error }}</div>
             {% endif %}
             
-            <form method="POST" action="/add" enctype="multipart/form-data">
+            <form method="POST" action="/recipe/{{ recipe._id }}/edit" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="name">Название рецепта</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="name" 
+                        name="name" 
+                        value="{{ recipe.name }}"
+                        required
+                    >
                 </div>
                 
                 <div class="form-group">
                     <label for="description">Описание</label>
-                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    <textarea 
+                        class="form-control" 
+                        id="description" 
+                        name="description" 
+                        rows="3" 
+                        required
+                    >{{ recipe.description }}</textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="cooking_time">Время приготовления (минут)</label>
-                    <input type="number" class="form-control" id="cooking_time" name="cooking_time" min="1" required>
+                    <input 
+                        type="number" 
+                        class="form-control" 
+                        id="cooking_time" 
+                        name="cooking_time" 
+                        min="1" 
+                        value="{{ recipe.cooking_time }}"
+                        required
+                    >
                 </div>
                 
                 <div class="form-group">
                     <label for="difficulty">Сложность</label>
                     <select class="form-control" id="difficulty" name="difficulty" required>
-                        <option value="Легко">Легко</option>
-                        <option value="Средне">Средне</option>
-                        <option value="Сложно">Сложно</option>
+                        <option value="Легко" {% if recipe.difficulty == 'Легко' %}selected{% endif %}>Легко</option>
+                        <option value="Средне" {% if recipe.difficulty == 'Средне' %}selected{% endif %}>Средне</option>
+                        <option value="Сложно" {% if recipe.difficulty == 'Сложно' %}selected{% endif %}>Сложно</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label for="servings">Количество порций</label>
-                    <input type="number" class="form-control" id="servings" name="servings" min="1" required>
+                    <input 
+                        type="number" 
+                        class="form-control" 
+                        id="servings" 
+                        name="servings" 
+                        min="1" 
+                        value="{{ recipe.servings }}"
+                        required
+                    >
                 </div>
                 
                 <div class="form-group">
                     <label for="ingredients">Ингредиенты (каждый ингредиент с новой строки)</label>
-                    <textarea class="form-control" id="ingredients" name="ingredients" rows="5" required></textarea>
+                    <textarea 
+                        class="form-control" 
+                        id="ingredients" 
+                        name="ingredients" 
+                        rows="5" 
+                        required
+                    >{{ recipe.ingredients | join('\n') }}</textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="instructions">Шаги приготовления (каждый шаг с новой строки)</label>
-                    <textarea class="form-control" id="instructions" name="instructions" rows="5" required></textarea>
+                    <textarea 
+                        class="form-control" 
+                        id="instructions" 
+                        name="instructions" 
+                        rows="5" 
+                        required
+                    >{{ recipe.instructions | join('\n') }}</textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="category">Категория</label>
-                    <input type="text" class="form-control" id="category" name="category" required>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="category" 
+                        name="category" 
+                        value="{{ recipe.category }}"
+                        required
+                    >
                 </div>
 
                 <div class="form-group">
-                    <label for="image">Изображение рецепта</label>
+                    <label for="image">Новое изображение рецепта</label>
                     <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                    <small class="form-text text-muted">Поддерживаемые форматы: JPG, PNG, GIF</small>
+                    <small class="form-text text-muted">Оставьте пустым, чтобы сохранить текущее изображение</small>
                 </div>
                 
-                <button type="submit" class="btn">
-                    <i class="fas fa-plus-circle"></i>
-                    Добавить рецепт
-                </button>
+                {% if recipe.images and recipe.images[0] %}
+                <div class="image-container">
+                    <span class="image-label">Текущее изображение:</span>
+                    <img 
+                        src="{{ recipe.images[0] }}" 
+                        alt="Текущее изображение рецепта" 
+                        class="current-image"
+                    >
+                </div>
+                {% endif %}
+                
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-save">
+                        <i class="fas fa-save"></i>
+                        Сохранить изменения
+                    </button>
+                    
+                    <button 
+                        type="button" 
+                        class="btn btn-delete" 
+                        onclick="confirmDelete()"
+                    >
+                        <i class="fas fa-trash-alt"></i>
+                        Удалить рецепт
+                    </button>
+                </div>
             </form>
         </div>
     </main>
@@ -415,5 +543,19 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function confirmDelete() {
+            if (confirm('Вы уверены, что хотите удалить этот рецепт? Это действие нельзя отменить.')) {
+                // Создаем скрытую форму для отправки запроса на удаление
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/recipe/{{ recipe._id }}/delete';
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
 </body>
 </html>

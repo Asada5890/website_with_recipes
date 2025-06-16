@@ -1,13 +1,16 @@
 from fastapi import APIRouter, HTTPException, Depends, Request, Form
-from jose import JWTError
-import jwt
+from sqlalchemy.orm import Session 
 from pydantic import ValidationError
 from core.settings import settings
 from models.user import User
 from schemas.auth import Token, UserResponse
+from db.session import get_db
+
 
 from schemas.user import UserCreate, UserLogin
 from services.auth_service import AuthService
+from services.favorite_service import FavoriteService
+from services.recipe_service import RecipeService
 from services.user_service import UserDoesNotExist, UserService, UniqueViolation
 from core.security import get_current_user
 from fastapi.templating import Jinja2Templates
@@ -116,37 +119,57 @@ async def logout_user():
 
 
 @router.get("/profile", response_class=HTMLResponse)
-def profile_page(request: Request):
-    # Проверяем наличие токена в куках
-    token = request.cookies.get("access_token")
-    if not token:
-        return RedirectResponse(url="auth_templates/login", status_code=303)
+async def profile_page(
+    request: Request,
+    user_service: UserService = Depends(),
+    recipe_service: RecipeService = Depends(),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
     
     try:
-        # Декодируем токен
-        payload = jwt.decode(
-            token.replace("Bearer ", ""),
-            settings.SECRET_KEY,
-            algorithms=[settings.JWT_ALGORITHM]
+        user_id = current_user["id"]
+        user = user_service.get_user_by_id(user_id)
+        if not user:
+            return RedirectResponse("/login", status_code=303)
+
+        # Получаем рецепты пользователя и избранное
+        fav_service = FavoriteService(db)
+        favorites = fav_service.get_user_favorites(user_id)
+        favorite_recipes = []
+        user_recipes = recipe_service.get_recipes_by_author(user_id)
+
+        # Обрабатываем избранные рецепты
+        for fav in favorites:
+            recipe = recipe_service.get_recipe_by_id(fav.recipe_id)
+            if recipe:
+                recipe["_id"] = str(recipe["_id"])
+                if not recipe.get("images") or not recipe["images"][0]:
+                    recipe["images"] = ["/static/images/recipe-default.jpg"]
+                favorite_recipes.append(recipe)
+        
+        # Обрабатываем рецепты пользователя
+        processed_recipes = []
+        for recipe in user_recipes:
+            recipe["_id"] = str(recipe["_id"])
+            if not recipe.get("images") or not recipe["images"][0]:
+                recipe["images"] = ["/static/images/recipe-default.jpg"]
+            processed_recipes.append(recipe)
+
+        return templates.TemplateResponse(
+            "global_profile.html",
+            {
+                "request": request,
+                "user": user,
+                "user_recipes": processed_recipes,
+                "favorite_recipes": favorite_recipes,
+                "is_owner": True,
+                "current_user": current_user
+            }
         )
         
-        user_email = payload.get("email")  
-        user_id = payload.get("id")  
-
-
-        
-    except (JWTError, KeyError):
-        # Обработка невалидного токена
-        response = RedirectResponse(url="/login", status_code=303)
-        response.delete_cookie("access_token")
-        return response
-    
-    # Передаем данные в шаблон профиля
-    return templates.TemplateResponse(
-        "global_profile.html",
-        {
-            "request": request,
-            "user_email": user_email,
-            "user_id": user_id,
-        }
-    )
+    except Exception as e:
+        print(f"Error loading profile: {str(e)}")
+        return RedirectResponse("/", status_code=303)

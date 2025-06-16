@@ -1,6 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 import uuid
+from bson import ObjectId
 from fastapi import File, Request, HTTPException, APIRouter,Depends, UploadFile
 from bson.errors import InvalidId
 from fastapi.staticfiles import StaticFiles
@@ -242,3 +243,143 @@ async def add_recipe(
             "user": current_user,
             "error": f"Ошибка при добавлении рецепта: {str(e)}"
         }, status_code=400)
+    
+
+@router.get('/recipe/{recipe_id}/edit', response_class=HTMLResponse)
+async def edit_recipe_form(
+    request: Request,
+    recipe_id: str,
+    recipe_service: RecipeService = Depends(),
+    current_user: dict = Depends(get_current_user)
+):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+    
+    recipe = recipe_service.get_recipe_by_id(recipe_id)
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Рецепт не найден")
+    
+    # Проверяем, что текущий пользователь - автор рецепта
+    if recipe.get("user_id") != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
+    
+    return templates.TemplateResponse(
+        "edit_recipe.html",
+        {
+            "request": request,
+            "recipe": recipe,
+            "user": current_user
+        }
+    )
+
+@router.post('/recipe/{recipe_id}/edit', response_class=HTMLResponse)
+async def update_recipe(
+    request: Request,
+    recipe_id: str,
+    name: str = Form(...),
+    description: str = Form(...),
+    cooking_time: int = Form(...),
+    difficulty: str = Form(...),
+    servings: int = Form(...),
+    ingredients: str = Form(...),
+    instructions: str = Form(...),
+    category: str = Form(...),
+    image: UploadFile = File(None),
+    current_user: dict = Depends(get_current_user),
+    recipe_service: RecipeService = Depends()
+):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+    
+    # Проверяем существование рецепта и права доступа
+    existing_recipe = recipe_service.get_recipe_by_id(recipe_id)
+    if not existing_recipe:
+        raise HTTPException(status_code=404, detail="Рецепт не найден")
+    
+    if existing_recipe.get("user_id") != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
+    
+    try:
+        # Обработка изображения
+        image_path = None
+        if image and image.filename:
+            file_extension = image.filename.split(".")[-1]
+            filename = f"{uuid.uuid4()}.{file_extension}"
+            file_path = IMAGES_DIR / filename
+            
+            with open(file_path, "wb") as f:
+                content = await image.read()
+                f.write(content)
+            
+            image_path = f"/static/images/{filename}"
+        
+        # Подготавливаем данные для обновления
+        update_data = {
+            "name": name,
+            "description": description,
+            "cooking_time": cooking_time,
+            "difficulty": difficulty,
+            "servings": servings,
+            "ingredients": [ing.strip() for ing in ingredients.split('\n') if ing.strip()],
+            "instructions": [inst.strip() for inst in instructions.split('\n') if inst.strip()],
+            "category": category,
+            "updated_at": datetime.utcnow()
+        }
+        
+        if image_path:
+            update_data["images"] = [image_path]
+        
+        # Обновляем рецепт
+        result = recipe_service.collection.update_one(
+            {"_id": ObjectId(recipe_id)},
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise Exception("Рецепт не был обновлен")
+        
+        return RedirectResponse(f"/recipe/{recipe_id}", status_code=303)
+    
+    except Exception as e:
+        print(f"Error updating recipe: {str(e)}")
+        return templates.TemplateResponse(
+            "edit_recipe.html",
+            {
+                "request": request,
+                "recipe": existing_recipe,
+                "user": current_user,
+                "error": f"Ошибка при обновлении рецепта: {str(e)}"
+            },
+            status_code=400
+        )
+
+@router.post('/recipe/{recipe_id}/delete', response_class=RedirectResponse)
+async def delete_recipe(
+    request: Request,
+    recipe_id: str,
+    current_user: dict = Depends(get_current_user),
+    recipe_service: RecipeService = Depends()
+):
+    if not current_user:
+        return RedirectResponse("/login", status_code=303)
+    
+    recipe = recipe_service.get_recipe_by_id(recipe_id)
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Рецепт не найден")
+    
+    if recipe.get("user_id") != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
+    
+    try:
+        deleted = recipe_service.delete_recepie_by_id(recipe_id)
+        if not deleted:
+            raise Exception("Рецепт не был удален")
+        
+        return RedirectResponse("/profile", status_code=303)
+    
+    except Exception as e:
+        print(f"Error deleting recipe: {str(e)}")
+        return RedirectResponse(
+            f"/recipe/{recipe_id}",
+            status_code=303
+        )

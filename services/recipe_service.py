@@ -93,6 +93,21 @@ class RecipeService:
         """
         return self.collection.distinct("category")
     
+
+    def update_recipe(self, recipe_id: str, update_data: dict) -> bool:
+        """
+        Обновляет рецепт по ID
+        """
+        try:
+            result = self.collection.update_one(
+                {"_id": ObjectId(recipe_id)},
+                {"$set": update_data}
+            )
+            return result.modified_count > 0
+        except Exception as e:
+            print(f"Error updating recipe: {str(e)}")
+            return False
+    
     def get_recepies_by_category(self, category_name):
         """
         Возвращает все продукты по категории

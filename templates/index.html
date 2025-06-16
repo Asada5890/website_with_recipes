@@ -517,6 +517,15 @@
             all:unset;
             cursor: pointer;
         }
+
+        .no-login-btn{
+            background-color: #f1c40f;
+            padding: 5px;
+            border-radius: 16px;
+            text-align: center;
+            color:var(--primary);
+            font-weight: bold;
+        }
         
         .badge {
             position: absolute;
@@ -601,10 +610,6 @@
                     <i class="fas fa-info-circle"></i>
                     Информация
                 </a>
-                <a href="/contacts" class="nav-link">
-                    <i class="fas fa-address-book"></i>
-                    Контакты
-                </a>
             </div>
 
             <div class="auth-buttons" id="authButtons">
@@ -628,6 +633,10 @@
                             </a>
                             <span class="nav-separator">|</span>
                         {% else %}
+                        <a href="/add" class="nav-link">
+                    <i class="fas fa-address-book"></i>
+                    Добавить рецепт
+                </a>
                             <a href="/profile/{{ id }}" class="nav-link">
                                 <i class="fas fa-user"></i>
                                 Профиль
@@ -720,10 +729,9 @@
                             </button>
                         </form>
                         {% else %}
-                        <a href="/login" class="save-btn">
-                            <i class="fas fa-heart"></i>
+                        <p href="/login" class="no-login-btn">
                             Войдите, чтобы сохранить
-                        </a>
+                    </p>
                         {% endif %}
                     </div>
                 </div>
